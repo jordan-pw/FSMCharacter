@@ -17,14 +17,6 @@ public abstract class MovingState : IState
     private PlayerInputActions playerInputActions;
     private InputActionMap playerActionMap;
 
-    public MovingState(PlayerController player)
-    {
-        owner = player;
-        gravity = owner.GetGravity();
-        gravityMultiplier = owner.GetGravityMultiplier();
-        gravity *= gravityMultiplier;
-    }
-
     public abstract void Enter();
 
     public abstract void Execute();
