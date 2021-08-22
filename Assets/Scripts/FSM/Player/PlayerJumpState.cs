@@ -5,19 +5,24 @@ public class PlayerJumpState : MovingState
 {
     private bool hasJumped;
 
-    public PlayerJumpState(PlayerController player) : base(player)
+    public PlayerJumpState(PlayerController player)
     {
+        owner = player;
         InitiateInputSystem();
-        velocity = GetPreviousMovingState().velocity;
     }
 
     public override void Enter()
     {
         // Instantiate input system components
         Debug.Log("Entering Jump State");
-
         jump.canceled += OnJumpCanceled;
         owner.SetMaterial(owner.jumpMaterial);
+        // Set gravity
+        gravity = owner.GetGravity();
+        gravityMultiplier = owner.GetGravityMultiplier();
+        gravity *= gravityMultiplier;
+        // Set velocity
+        velocity = GetPreviousMovingState().velocity;
 
         isStateActive = true;
         // Jump!

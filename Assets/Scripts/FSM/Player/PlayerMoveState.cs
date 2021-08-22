@@ -8,10 +8,10 @@ public class PlayerMoveState : MovingState
     private float maxSpeedChange;
     private bool hasMoved;
 
-    public PlayerMoveState(PlayerController player) : base(player)
+    public PlayerMoveState(PlayerController player)
     {
+        owner = player;
         InitiateInputSystem();
-        velocity = GetPreviousMovingState().velocity;
     }
 
 
@@ -19,11 +19,16 @@ public class PlayerMoveState : MovingState
     {
         // Instantiate input system components
         Debug.Log("Entering Move State");
-
         // Callback for when a movement keys are released
         movement.canceled += OnMovementCanceled;
         // Change material
         owner.SetMaterial(owner.moveMaterial);
+        // Set gravity
+        gravity = owner.GetGravity();
+        gravityMultiplier = owner.GetGravityMultiplier();
+        gravity *= gravityMultiplier;
+        // Set velocity
+        velocity = GetPreviousMovingState().velocity;
 
         // State is active and the character hasn't moved yet
         isStateActive = true;
