@@ -10,6 +10,13 @@ public class PlayerJumpState : MovingState
     public override void Enter()
     {
         Debug.Log("Entering Jump State");
+        toggleSprint = owner.toggleSprint;
+        if (toggleSprint)
+        {
+            sprinting = toggleSprint;
+        }
+        else sprinting = GetPreviousMovingState().sprinting;
+        // Set material
         owner.SetMaterial(owner.jumpMaterial);
         // Set velocity
         velocity = GetPreviousMovingState().velocity;
@@ -72,4 +79,36 @@ public class PlayerJumpState : MovingState
         }
     }
 
+    public override void OnSprint(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+            sprinting = true;
+        }
+    }
+
+    public override void OnSprintCanceled(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+
+            if (toggleSprint == true)
+            {
+                sprinting = true;
+            }
+            else
+            {
+                sprinting = false;
+            }
+        }
+    }
+
+    public override void OnSprintToggle(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+            owner.toggleSprint = !owner.toggleSprint;
+            Debug.Log(owner.toggleSprint);
+        }
+    }
 }

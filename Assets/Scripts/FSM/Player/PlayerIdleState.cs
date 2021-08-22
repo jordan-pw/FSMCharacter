@@ -51,4 +51,36 @@ public class PlayerIdleState : MovingState
         }
     }
 
+    public override void OnSprint(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+            sprinting = true;
+        }
+    }
+
+    public override void OnSprintCanceled(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+
+            if (toggleSprint == true)
+            {
+                sprinting = true;
+            }
+            else
+            {
+                sprinting = false;
+            }
+        }
+    }
+
+    public override void OnSprintToggle(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+            owner.toggleSprint = !owner.toggleSprint;
+            Debug.Log(owner.toggleSprint);
+        }
+    }
 }

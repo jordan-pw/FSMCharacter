@@ -1357,11 +1357,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f92530fd5f1e51549b5f44bb7763aff1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  toggleSprint: 0
+  characterController: {fileID: 0}
   idleMaterial: {fileID: 2100000, guid: d0376b9eeb6fab5409d1a3fcd5534d42, type: 2}
   jumpMaterial: {fileID: 2100000, guid: 94c1ba3a05981344d83d8cf0bdece33d, type: 2}
   moveMaterial: {fileID: 2100000, guid: dcf5851d51f03e54e945961a60c06b93, type: 2}
-  characterController: {fileID: 0}
+  sprintMaterial: {fileID: 2100000, guid: c23a02b7f424df542b75c5072ecb2888, type: 2}
   maxSpeed: 10
+  sprintSpeed: 15
   maxAcceleration: 50.1
   maxAirAcceleration: 31
   gravityMultiplier: 2
@@ -10020,7 +10023,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-12628
+  m_Name: pb_Mesh17876
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2

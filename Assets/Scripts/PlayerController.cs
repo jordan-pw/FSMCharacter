@@ -7,14 +7,20 @@ public class PlayerController : MonoBehaviour
 
     const float Gravity = -9.81f;
 
-    [SerializeField]
-    public Material idleMaterial, jumpMaterial, moveMaterial;
+    [HideInInspector]
+    public bool toggleSprint;
 
     [HideInInspector]
     public CharacterController characterController;
 
+    [SerializeField]
+    public Material idleMaterial, jumpMaterial, moveMaterial, sprintMaterial;
+
     [SerializeField, Range(0f, 100f)]
     private float maxSpeed = 10f;
+
+    [SerializeField, Range(0f, 100f)]
+    private float sprintSpeed = 10f;
 
     [SerializeField, Range(0f, 100f)]
     private float maxAcceleration = 10f;
@@ -48,6 +54,11 @@ public class PlayerController : MonoBehaviour
         return maxSpeed;
     }
 
+    public float GetSprintSpeed()
+    {
+        return sprintSpeed;
+    }
+
     public float GetMaxAcceleration()
     {
         return maxAcceleration ;
@@ -78,6 +89,8 @@ public class PlayerController : MonoBehaviour
         bodyStateMachine = new StateMachine();
         bodyStateMachine.Configure(new PlayerIdleState(this));
         characterController = GetComponent<CharacterController>();
+
+        toggleSprint = false;
     }
 
     private void FixedUpdate()

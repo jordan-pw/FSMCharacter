@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,18 +7,28 @@ public class PlayerMoveState : MovingState
     private Vector3 move;
 
     private float maxSpeedChange;
+    private float sprintSpeed;
 
     public PlayerMoveState(PlayerController player) : base(player) { }
 
     public override void Enter()
     {
         Debug.Log("Entering Move State");
-        // Callback for when a movement keys are released
+        // Callbacks for when movement keys are used
         movement.canceled += OnMovementCanceled;
-        // Change material
-        owner.SetMaterial(owner.moveMaterial);
         // Set velocity
         velocity = GetPreviousMovingState().velocity;
+        // Set sprint fields
+        sprintSpeed = owner.GetSprintSpeed();
+        toggleSprint = owner.toggleSprint;
+        if (toggleSprint)
+        {
+            sprinting = toggleSprint;
+        }
+        else sprinting = GetPreviousMovingState().sprinting;
+        // Change material
+        if (!sprinting) owner.SetMaterial(owner.moveMaterial);
+        else owner.SetMaterial(owner.sprintMaterial);
         // State is active and the character hasn't moved yet
         isStateActive = true;
     }
@@ -28,11 +39,18 @@ public class PlayerMoveState : MovingState
         {
             Debug.Log("Executing Move State");
 
-            // Velocity is the horizontal and vertical axis's multiplied by speed
-            float speed = owner.GetMaxSpeed();
+            // Variables for movement
+            float speed;
+            if (owner.characterController.isGrounded)
+            {
+                speed = sprinting ? sprintSpeed : owner.GetMaxSpeed();
+            }  // Can't sprint in the air
+            else speed = owner.GetMaxSpeed();
+
             float maxAcceleration = owner.GetMaxAcceleration();
             float maxAirAcceleration = owner.GetMaxAirAcceleration();
 
+            // Desired velocity is the direction*speed
             Vector3 desiredVelocity = 
                 new Vector3(move.x * speed, -1f, move.z * speed);
 
@@ -93,6 +111,51 @@ public class PlayerMoveState : MovingState
                 0f, 
                 context.ReadValue<Vector2>().y
                 );
+        }
+    }
+
+    public override void OnSprint(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+            sprinting = true;
+            owner.SetMaterial(owner.sprintMaterial);
+        }
+    }
+
+    public override void OnSprintCanceled(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+
+            if (toggleSprint == true)
+            {
+                sprinting = true;
+            }
+            else
+            {
+                sprinting = false;
+                owner.SetMaterial(owner.moveMaterial);
+            }
+        }
+    }
+
+    public override void OnSprintToggle(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+            toggleSprint = !toggleSprint;
+            sprinting = toggleSprint;
+            owner.toggleSprint = toggleSprint;
+
+            if (toggleSprint)
+            {
+                owner.SetMaterial(owner.sprintMaterial);
+            }
+            else
+            {
+                owner.SetMaterial(owner.moveMaterial);
+            }
         }
     }
 

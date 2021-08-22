@@ -5,10 +5,15 @@ public abstract class MovingState : IState
     // Initiate fields
     public InputAction movement;
     public InputAction jump;
+    public InputAction sprint;
+    public InputAction sprintToggle;
 
     public float gravity;
     public float gravityMultiplier;
     public Vector3 velocity;
+
+    public bool toggleSprint;
+    public bool sprinting;
 
     protected bool isStateActive;
 
@@ -38,6 +43,12 @@ public abstract class MovingState : IState
     // Event happens when movement input are used
     public abstract void OnMovement(InputAction.CallbackContext context);
 
+    public abstract void OnSprint(InputAction.CallbackContext context);
+
+    public abstract void OnSprintCanceled(InputAction.CallbackContext context);
+
+    public abstract void OnSprintToggle(InputAction.CallbackContext context);
+
     public void InitiateInputSystem()
     {
         // Instantiate input system components
@@ -46,15 +57,22 @@ public abstract class MovingState : IState
 
         // Find actions and assign them to input actions
         movement = playerActionMap.FindAction("Movement");
+        sprint = playerActionMap.FindAction("Sprint");
+        sprintToggle = playerActionMap.FindAction("SprintToggle");
         jump = playerActionMap.FindAction("Jump");
 
         // Create events
         movement.performed += OnMovement;
         jump.performed += OnJump;
+        sprint.performed += OnSprint;
+        sprint.canceled += OnSprintCanceled;
+        sprintToggle.performed += OnSprintToggle;
 
         // Enable input actions
         movement.Enable();
         jump.Enable();
+        sprint.Enable();
+        sprintToggle.Enable();
     }
 
     public IState GetPreviousState()
