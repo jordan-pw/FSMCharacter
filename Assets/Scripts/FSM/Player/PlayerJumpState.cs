@@ -5,25 +5,15 @@ public class PlayerJumpState : MovingState
 {
     private bool hasJumped;
 
-    public PlayerJumpState(PlayerController player)
-    {
-        owner = player;
-        InitiateInputSystem();
-    }
+    public PlayerJumpState(PlayerController player) : base(player) { }
 
     public override void Enter()
     {
-        // Instantiate input system components
         Debug.Log("Entering Jump State");
-        jump.canceled += OnJumpCanceled;
         owner.SetMaterial(owner.jumpMaterial);
-        // Set gravity
-        gravity = owner.GetGravity();
-        gravityMultiplier = owner.GetGravityMultiplier();
-        gravity *= gravityMultiplier;
         // Set velocity
         velocity = GetPreviousMovingState().velocity;
-
+        // State is active
         isStateActive = true;
         // Jump!
         velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y * 5f);
@@ -67,17 +57,11 @@ public class PlayerJumpState : MovingState
     {
         if (isStateActive)
         {
+            // Double jump!
             return;
         }
     }
 
-    private void OnJumpCanceled(InputAction.CallbackContext context)
-    {
-        if (isStateActive)
-        {
-            //owner.ChangeState(new PlayerIdleState(owner));
-        }
-    }
 
     // Event happens when movement inputs are used
     public override void OnMovement(InputAction.CallbackContext context)

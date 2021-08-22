@@ -2,24 +2,18 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 public class PlayerIdleState : MovingState
 {
-    public PlayerIdleState(PlayerController player)
-    {
-        owner = player;
-        InitiateInputSystem();
-    }
+    public PlayerIdleState(PlayerController player) : base(player) { }
 
     public override void Enter()
     {
         // Instantiate input system components
         Debug.Log("Entering Idle State");
-        isStateActive = true;
+        // Change material
         owner.SetMaterial(owner.idleMaterial);
-
+        // Set velocity
         velocity = Vector3.zero;
-
-        gravity = owner.GetGravity();
-        gravityMultiplier = owner.GetGravityMultiplier();
-        gravity *= gravityMultiplier;
+        // State is active
+        isStateActive = true;
     }
 
     public override void Execute()
@@ -27,7 +21,7 @@ public class PlayerIdleState : MovingState
         Debug.Log("Executing Idle State");
 
         // Even in idle, gravity must apply.
-        // In the future, this will be replaced by a falling state
+        // In the future, this may be replaced by a falling state
         owner.characterController.Move(new Vector3(0, gravity, 0) * Time.deltaTime);
     }
 
