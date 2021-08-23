@@ -7,6 +7,11 @@ public class PlayerController : MonoBehaviour
 
     const float Gravity = -9.81f;
 
+    public bool allowAirDash;
+
+    [HideInInspector]
+    public bool toggleCrouch;
+
     [HideInInspector]
     public bool toggleSprint;
 
@@ -14,13 +19,16 @@ public class PlayerController : MonoBehaviour
     public CharacterController characterController;
 
     [SerializeField]
-    public Material idleMaterial, jumpMaterial, moveMaterial, sprintMaterial;
+    public Material idleMaterial, jumpMaterial, moveMaterial, sprintMaterial, crouchMaterial, dodgeMaterial;
 
     [SerializeField, Range(0f, 100f)]
     private float maxSpeed = 10f;
 
     [SerializeField, Range(0f, 100f)]
     private float sprintSpeed = 10f;
+
+    [SerializeField, Range(0f, 100f)]
+    private float crouchSpeed = 10f;
 
     [SerializeField, Range(0f, 100f)]
     private float maxAcceleration = 10f;
@@ -58,6 +66,12 @@ public class PlayerController : MonoBehaviour
     {
         return sprintSpeed;
     }
+
+    public float GetCrouchSpeed()
+    {
+        return crouchSpeed;
+    }
+
 
     public float GetMaxAcceleration()
     {

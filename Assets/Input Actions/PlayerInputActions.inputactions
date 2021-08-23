@@ -23,7 +23,7 @@
                 },
                 {
                     "name": "Sprint",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "916e4607-bd76-4771-91c2-c01e8acf5ff0",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -33,6 +33,30 @@
                     "name": "SprintToggle",
                     "type": "Button",
                     "id": "8f06a8ed-78a1-4f7b-a457-c12186024587",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Crouch",
+                    "type": "Value",
+                    "id": "fb2f557d-2745-47d3-a4cd-821b65f3896f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "CrouchToggle",
+                    "type": "Button",
+                    "id": "2adcc274-5af2-4e21-85bb-87dde56157e0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Dodge",
+                    "type": "Button",
+                    "id": "489414f7-ac48-48e4-bd1a-7cdac9959456",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -157,6 +181,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "SprintToggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "81408660-4e8f-4f5c-8992-30ff84bf7d9e",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Crouch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "15c326a1-fabe-4c1d-96ad-c7742c7e4fdb",
+                    "path": "<Keyboard>/leftAlt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dodge",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eba61ad1-7717-4512-b1d3-e5ba93515123",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CrouchToggle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

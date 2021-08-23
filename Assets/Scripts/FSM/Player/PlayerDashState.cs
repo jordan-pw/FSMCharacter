@@ -1,61 +1,34 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class PlayerJumpState : MovingState
+public class PlayerDodgeState : MovingState
 {
-    private bool hasJumped;
 
-    public PlayerJumpState(PlayerController player) : base(player) { }
+    public PlayerDodgeState(PlayerController player) : base(player) { }
 
     public override void Enter()
     {
-        Debug.Log("Entering Jump State");
-        toggleSprint = owner.toggleSprint;
-        if (toggleSprint)
-        {
-            sprinting = toggleSprint;
-        }
-        else sprinting = GetPreviousMovingState().sprinting;
-        // Set material
-        owner.SetMaterial(owner.jumpMaterial);
+        // Instantiate input system components
+        Debug.Log("Entering Dodge State");
+        // Change material
+        owner.SetMaterial(owner.idleMaterial);
         // Set velocity
-        velocity = GetPreviousMovingState().velocity;
+        velocity = Vector3.zero;
         // State is active
         isStateActive = true;
-        // Jump!
-        velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y * 5f);
     }
 
     public override void Execute()
     {
-        if (isStateActive)
-        {
-            Debug.Log("Executing Jump State");
+        Debug.Log("Executing Dodge State");
 
-            if (!owner.characterController.isGrounded)
-            {
-                hasJumped = true;
-            }
-
-            // Apply gravity
-            velocity.y += gravity * Time.deltaTime;
-            velocity.y = Mathf.Max(velocity.y, gravity);
-
-            Vector3 displacement = velocity * Time.deltaTime;
-            // Move the character controller (note that Move does not include gravity)
-            owner.characterController.Move(displacement);
-
-            if (owner.characterController.isGrounded)
-            {
-                hasJumped = false;
-                owner.ChangeState(new PlayerMoveState(owner));
-            }
-        }
+        // Even in idle, gravity must apply.
+        // In the future, this may be replaced by a falling state
+        owner.characterController.Move(new Vector3(0, gravity, 0) * Time.deltaTime);
     }
 
     public override void Exit()
     {
-        Debug.Log("Exiting Jump State");
+        Debug.Log("Exiting Dodge State");
         isStateActive = false; ;
     }
 
@@ -64,17 +37,17 @@ public class PlayerJumpState : MovingState
     {
         if (isStateActive)
         {
-            // Double jump!
-            return;
+            // When jumping, change to jump state
+            owner.ChangeState(new PlayerJumpState(owner));
         }
     }
 
-
-    // Event happens when movement inputs are used
+    // Event happens when movement input are used
     public override void OnMovement(InputAction.CallbackContext context)
     {
-        if (isStateActive && hasJumped)
+        if (isStateActive)
         {
+            // When moving, change to jump state
             owner.ChangeState(new PlayerMoveState(owner));
         }
     }
@@ -114,12 +87,15 @@ public class PlayerJumpState : MovingState
 
     public override void OnCrouch(InputAction.CallbackContext context)
     {
-        //throw new System.NotImplementedException();
+        if (isStateActive)
+        {
+            owner.ChangeState(new PlayerCrouchState(owner));
+        }
     }
 
     public override void OnCrouchCanceled(InputAction.CallbackContext context)
     {
-        //throw new System.NotImplementedException();
+        throw new System.NotImplementedException();
     }
 
     public override void OnCrouchToggle(InputAction.CallbackContext context)
@@ -129,6 +105,6 @@ public class PlayerJumpState : MovingState
 
     public override void OnDodge(InputAction.CallbackContext context)
     {
-        //throw new System.NotImplementedException();
+        throw new System.NotImplementedException();
     }
 }

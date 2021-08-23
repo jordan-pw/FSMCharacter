@@ -36,7 +36,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": ""Sprint"",
-                    ""type"": ""Button"",
+                    ""type"": ""Value"",
                     ""id"": ""916e4607-bd76-4771-91c2-c01e8acf5ff0"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -46,6 +46,30 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                     ""name"": ""SprintToggle"",
                     ""type"": ""Button"",
                     ""id"": ""8f06a8ed-78a1-4f7b-a457-c12186024587"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Crouch"",
+                    ""type"": ""Value"",
+                    ""id"": ""fb2f557d-2745-47d3-a4cd-821b65f3896f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""CrouchToggle"",
+                    ""type"": ""Button"",
+                    ""id"": ""2adcc274-5af2-4e21-85bb-87dde56157e0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Dodge"",
+                    ""type"": ""Button"",
+                    ""id"": ""489414f7-ac48-48e4-bd1a-7cdac9959456"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -172,6 +196,39 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                     ""action"": ""SprintToggle"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""81408660-4e8f-4f5c-8992-30ff84bf7d9e"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Crouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""15c326a1-fabe-4c1d-96ad-c7742c7e4fdb"",
+                    ""path"": ""<Keyboard>/leftAlt"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Dodge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""eba61ad1-7717-4512-b1d3-e5ba93515123"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CrouchToggle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -184,6 +241,9 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_SprintToggle = m_Player.FindAction("SprintToggle", throwIfNotFound: true);
+        m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
+        m_Player_CrouchToggle = m_Player.FindAction("CrouchToggle", throwIfNotFound: true);
+        m_Player_Dodge = m_Player.FindAction("Dodge", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -237,6 +297,9 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_SprintToggle;
+    private readonly InputAction m_Player_Crouch;
+    private readonly InputAction m_Player_CrouchToggle;
+    private readonly InputAction m_Player_Dodge;
     public struct PlayerActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -245,6 +308,9 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @SprintToggle => m_Wrapper.m_Player_SprintToggle;
+        public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
+        public InputAction @CrouchToggle => m_Wrapper.m_Player_CrouchToggle;
+        public InputAction @Dodge => m_Wrapper.m_Player_Dodge;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -266,6 +332,15 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 @SprintToggle.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSprintToggle;
                 @SprintToggle.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSprintToggle;
                 @SprintToggle.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSprintToggle;
+                @Crouch.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCrouch;
+                @Crouch.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCrouch;
+                @Crouch.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCrouch;
+                @CrouchToggle.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCrouchToggle;
+                @CrouchToggle.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCrouchToggle;
+                @CrouchToggle.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCrouchToggle;
+                @Dodge.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDodge;
+                @Dodge.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDodge;
+                @Dodge.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnDodge;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -282,6 +357,15 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 @SprintToggle.started += instance.OnSprintToggle;
                 @SprintToggle.performed += instance.OnSprintToggle;
                 @SprintToggle.canceled += instance.OnSprintToggle;
+                @Crouch.started += instance.OnCrouch;
+                @Crouch.performed += instance.OnCrouch;
+                @Crouch.canceled += instance.OnCrouch;
+                @CrouchToggle.started += instance.OnCrouchToggle;
+                @CrouchToggle.performed += instance.OnCrouchToggle;
+                @CrouchToggle.canceled += instance.OnCrouchToggle;
+                @Dodge.started += instance.OnDodge;
+                @Dodge.performed += instance.OnDodge;
+                @Dodge.canceled += instance.OnDodge;
             }
         }
     }
@@ -292,5 +376,8 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnSprintToggle(InputAction.CallbackContext context);
+        void OnCrouch(InputAction.CallbackContext context);
+        void OnCrouchToggle(InputAction.CallbackContext context);
+        void OnDodge(InputAction.CallbackContext context);
     }
 }

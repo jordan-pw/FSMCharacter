@@ -57,7 +57,8 @@ public class PlayerMoveState : MovingState
             // Max speed on change on ground is fast and responsive
             // Max speed change in the air is slower and less responsive
             maxSpeedChange = owner.characterController.isGrounded ? 
-                maxSpeedChange = maxAcceleration * Time.deltaTime : maxSpeedChange = maxAirAcceleration * Time.deltaTime;
+                maxSpeedChange = maxAcceleration * Time.deltaTime : 
+                maxSpeedChange = maxAirAcceleration * Time.deltaTime;
 
             // Move the x and z (horz and vert) velocity towards our desired velocity
             velocity.x =
@@ -86,7 +87,7 @@ public class PlayerMoveState : MovingState
     public override void Exit()
     {
         Debug.Log("Exiting Move State");
-        isStateActive = false; ;
+        isStateActive = false;
     }
 
     // Event happens when jump input is used
@@ -127,7 +128,6 @@ public class PlayerMoveState : MovingState
     {
         if (isStateActive)
         {
-
             if (toggleSprint == true)
             {
                 sprinting = true;
@@ -171,5 +171,35 @@ public class PlayerMoveState : MovingState
                 context.ReadValue<Vector2>().y
                 );
         }
+    }
+
+    public override void OnCrouch(InputAction.CallbackContext context)
+    {
+        if (isStateActive && owner.characterController.isGrounded)
+        {
+            owner.ChangeState(new PlayerCrouchState(owner));
+        }
+    }
+
+    public override void OnCrouchCanceled(InputAction.CallbackContext context)
+    {
+        //throw new System.NotImplementedException();
+    }
+
+    public override void OnCrouchToggle(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+            owner.toggleCrouch = !owner.toggleCrouch;
+            if (owner.toggleCrouch)
+            {
+                owner.ChangeState(new PlayerCrouchState(owner));
+            }
+        }
+    }
+
+    public override void OnDodge(InputAction.CallbackContext context)
+    {
+        throw new System.NotImplementedException();
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public abstract class MovingState : IState
@@ -7,6 +8,9 @@ public abstract class MovingState : IState
     public InputAction jump;
     public InputAction sprint;
     public InputAction sprintToggle;
+    public InputAction crouch;
+    public InputAction crouchToggle;
+    public InputAction dodge;
 
     public float gravity;
     public float gravityMultiplier;
@@ -14,6 +18,8 @@ public abstract class MovingState : IState
 
     public bool toggleSprint;
     public bool sprinting;
+    public bool toggleCrouch;
+    public bool crouching;
 
     protected bool isStateActive;
 
@@ -49,6 +55,14 @@ public abstract class MovingState : IState
 
     public abstract void OnSprintToggle(InputAction.CallbackContext context);
 
+    public abstract void OnDodge(InputAction.CallbackContext context);
+
+    public abstract void OnCrouch(InputAction.CallbackContext context);
+
+    public abstract void OnCrouchCanceled(InputAction.CallbackContext context);
+
+    public abstract void OnCrouchToggle(InputAction.CallbackContext context);
+
     public void InitiateInputSystem()
     {
         // Instantiate input system components
@@ -60,6 +74,9 @@ public abstract class MovingState : IState
         sprint = playerActionMap.FindAction("Sprint");
         sprintToggle = playerActionMap.FindAction("SprintToggle");
         jump = playerActionMap.FindAction("Jump");
+        crouch = playerActionMap.FindAction("Crouch");
+        crouchToggle = playerActionMap.FindAction("CrouchToggle");
+        dodge = playerActionMap.FindAction("Dodge");
 
         // Create events
         movement.performed += OnMovement;
@@ -67,12 +84,19 @@ public abstract class MovingState : IState
         sprint.performed += OnSprint;
         sprint.canceled += OnSprintCanceled;
         sprintToggle.performed += OnSprintToggle;
+        crouch.performed += OnCrouch;
+        crouch.canceled += OnCrouchCanceled;
+        crouchToggle.performed += OnCrouchToggle;
+        dodge.performed += OnDodge;
 
         // Enable input actions
         movement.Enable();
         jump.Enable();
         sprint.Enable();
         sprintToggle.Enable();
+        crouch.Enable();
+        crouchToggle.Enable();
+        dodge.Enable();
     }
 
     public IState GetPreviousState()
@@ -87,4 +111,5 @@ public abstract class MovingState : IState
         MovingState adjustedState = (MovingState)previousState;
         return adjustedState;
     }
+
 }

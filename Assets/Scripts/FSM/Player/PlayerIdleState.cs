@@ -83,4 +83,41 @@ public class PlayerIdleState : MovingState
             Debug.Log(owner.toggleSprint);
         }
     }
+
+    public override void OnCrouch(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+            owner.ChangeState(new PlayerCrouchState(owner));
+        }
+    }
+
+    public override void OnCrouchCanceled(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+            owner.toggleCrouch = !owner.toggleCrouch;
+            if (owner.toggleCrouch)
+            {
+                owner.ChangeState(new PlayerCrouchState(owner));
+            }
+        }
+    }
+
+    public override void OnCrouchToggle(InputAction.CallbackContext context)
+    {
+        if (isStateActive)
+        {
+            owner.toggleCrouch = !owner.toggleCrouch;
+            if (owner.toggleCrouch)
+            {
+                owner.ChangeState(new PlayerCrouchState(owner));
+            }
+        }
+    }
+
+    public override void OnDodge(InputAction.CallbackContext context)
+    {
+        throw new System.NotImplementedException();
+    }
 }
