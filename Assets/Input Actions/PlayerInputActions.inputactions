@@ -7,9 +7,9 @@
             "actions": [
                 {
                     "name": "Movement",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "33940a77-4f1e-417a-a239-c9e7a9235bf1",
-                    "expectedControlType": "Axis",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
                 },
@@ -23,7 +23,7 @@
                 },
                 {
                     "name": "Sprint",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "916e4607-bd76-4771-91c2-c01e8acf5ff0",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -39,7 +39,7 @@
                 },
                 {
                     "name": "Crouch",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "fb2f557d-2745-47d3-a4cd-821b65f3896f",
                     "expectedControlType": "Button",
                     "processors": "",

@@ -6,117 +6,144 @@ public class PlayerIdleState : MovingState
 
     public override void Enter()
     {
-        // Instantiate input system components
         Debug.Log("Entering Idle State");
+
+        if (crouching = GetPreviousMovingState() != null)
+        {
+            crouching = GetPreviousMovingState().crouching;
+        }
+        else crouching = false;
+
         // Change material
         owner.SetMaterial(owner.idleMaterial);
         // Set velocity
         velocity = Vector3.zero;
-        // State is active
-        isStateActive = true;
     }
 
     public override void Execute()
     {
         Debug.Log("Executing Idle State");
 
+        //Check for input
+        CheckInput();
+        CheckStateChange();
         // Even in idle, gravity must apply.
-        // In the future, this may be replaced by a falling state
         owner.characterController.Move(new Vector3(0, gravity, 0) * Time.deltaTime);
     }
 
     public override void Exit()
     {
         Debug.Log("Exiting Idle State");
-        isStateActive = false; ;
     }
 
-    // Event happens when jump input is used
-    public override void OnJump(InputAction.CallbackContext context)
+    public override void CheckStateChange()
     {
-        if (isStateActive)
+        if (movementPerformed)
         {
-            // When jumping, change to jump state
-            owner.ChangeState(new PlayerJumpState(owner));
+            OnMovementPerformed();
+        }
+
+        if (jumpPerformed)
+        {
+            OnJumpPerformed();
+        }
+
+        if (sprintPerformed)
+        {
+            OnSprintPerformed();
+        }
+
+        if (sprintCanceled)
+        {
+            OnSprintCanceled();
+        }
+
+        if (sprintTogglePerformed)
+        {
+            OnSprintTogglePerformed();
+        }
+
+        if (sprintToggleCanceled)
+        {
+            OnSprintToggleCanceled();
+        }
+
+        if (crouchPerformed)
+        {
+            OnCrouchPerformed();
+        }
+
+        if (crouchTogglePerformed)
+        {
+            OnCrouchTogglePerformed();
+        }
+
+        if (crouchToggleCanceled)
+        {
+            OnCrouchToggleCanceled();
+        }
+
+        if (dodgePerformed)
+        {
+            OnDodgePerformed();
         }
     }
-
-    // Event happens when movement input are used
-    public override void OnMovement(InputAction.CallbackContext context)
+    private void OnMovementPerformed()
     {
-        if (isStateActive)
-        {
-            // When moving, change to jump state
-            owner.ChangeState(new PlayerMoveState(owner));
-        }
+        owner.ChangeState(new PlayerMoveState(owner));
     }
 
-    public override void OnSprint(InputAction.CallbackContext context)
+    private void OnJumpPerformed()
     {
-        if (isStateActive)
-        {
-            sprinting = true;
-        }
+        owner.ChangeState(new PlayerJumpState(owner));
     }
 
-    public override void OnSprintCanceled(InputAction.CallbackContext context)
+    private void OnSprintPerformed()
     {
-        if (isStateActive)
-        {
-
-            if (toggleSprint == true)
-            {
-                sprinting = true;
-            }
-            else
-            {
-                sprinting = false;
-            }
-        }
+        sprinting = true;
     }
 
-    public override void OnSprintToggle(InputAction.CallbackContext context)
+    private void OnSprintCanceled()
     {
-        if (isStateActive)
+        sprinting = false;
+    }
+
+    private void OnSprintTogglePerformed()
+    {
+        if (!hasPressedSprintToggle) 
         {
+            hasPressedSprintToggle = true;
             owner.toggleSprint = !owner.toggleSprint;
-            Debug.Log(owner.toggleSprint);
         }
     }
 
-    public override void OnCrouch(InputAction.CallbackContext context)
+    private void OnSprintToggleCanceled()
     {
-        if (isStateActive)
+        hasPressedSprintToggle = false;
+    }
+
+    private void OnCrouchPerformed()
+    {
+        owner.ChangeState(new PlayerCrouchState(owner));
+    }
+
+    private void OnCrouchTogglePerformed()
+    {
+        if (!hasPressedCrouchToggle && !crouching)
         {
+            owner.toggleCrouch = true;
+            crouching = true;
             owner.ChangeState(new PlayerCrouchState(owner));
         }
     }
 
-    public override void OnCrouchCanceled(InputAction.CallbackContext context)
+    private void OnCrouchToggleCanceled()
     {
-        if (isStateActive)
-        {
-            owner.toggleCrouch = !owner.toggleCrouch;
-            if (owner.toggleCrouch)
-            {
-                owner.ChangeState(new PlayerCrouchState(owner));
-            }
-        }
+        hasPressedCrouchToggle = false;
+        crouching = false;
     }
 
-    public override void OnCrouchToggle(InputAction.CallbackContext context)
-    {
-        if (isStateActive)
-        {
-            owner.toggleCrouch = !owner.toggleCrouch;
-            if (owner.toggleCrouch)
-            {
-                owner.ChangeState(new PlayerCrouchState(owner));
-            }
-        }
-    }
-
-    public override void OnDodge(InputAction.CallbackContext context)
+    private void OnDodgePerformed()
     {
         throw new System.NotImplementedException();
     }

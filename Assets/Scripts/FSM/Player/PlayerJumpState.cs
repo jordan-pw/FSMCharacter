@@ -20,115 +20,159 @@ public class PlayerJumpState : MovingState
         owner.SetMaterial(owner.jumpMaterial);
         // Set velocity
         velocity = GetPreviousMovingState().velocity;
-        // State is active
-        isStateActive = true;
-        // Jump!
-        velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y * 5f);
     }
 
     public override void Execute()
     {
-        if (isStateActive)
+        Debug.Log("Executing Jump State");
+
+        //Check for input
+        CheckInput();
+        CheckStateChange();
+
+        if (!owner.characterController.isGrounded)
         {
-            Debug.Log("Executing Jump State");
+            hasJumped = true;
+        }
 
-            if (!owner.characterController.isGrounded)
-            {
-                hasJumped = true;
-            }
+        // Apply gravity
+        velocity.y += gravity * Time.deltaTime;
+        velocity.y = Mathf.Max(velocity.y, gravity);
 
-            // Apply gravity
-            velocity.y += gravity * Time.deltaTime;
-            velocity.y = Mathf.Max(velocity.y, gravity);
+        Vector3 displacement = velocity * Time.deltaTime;
+        // Move the character controller (note that Move does not include gravity)
+        owner.characterController.Move(displacement);
 
-            Vector3 displacement = velocity * Time.deltaTime;
-            // Move the character controller (note that Move does not include gravity)
-            owner.characterController.Move(displacement);
-
-            if (owner.characterController.isGrounded)
-            {
-                hasJumped = false;
-                owner.ChangeState(new PlayerMoveState(owner));
-            }
+        if (owner.characterController.isGrounded)
+        {
+            hasJumped = false;
+            owner.ChangeState(new PlayerMoveState(owner));
         }
     }
 
     public override void Exit()
     {
         Debug.Log("Exiting Jump State");
-        isStateActive = false; ;
     }
 
-    // Event happens when jump input is used
-    public override void OnJump(InputAction.CallbackContext context)
+    public override void CheckStateChange()
     {
-        if (isStateActive)
+        if (movementPerformed)
         {
-            // Double jump!
-            return;
+            OnMovementPerformed();
+        }
+
+        if (jumpPerformed)
+        {
+            OnJumpPerformed();
+        }
+
+        if (jumpCanceled)
+        {
+            OnJumpCanceled();
+        }
+
+        if (sprintPerformed)
+        {
+            OnSprintPerformed();
+        }
+
+        if (sprintCanceled)
+        {
+            OnSprintCanceled();
+        }
+
+        if (sprintTogglePerformed)
+        {
+            OnSprintTogglePerformed();
+        }
+
+        if (sprintToggleCanceled)
+        {
+            OnSprintToggleCanceled();
+        }
+
+        if (crouchTogglePerformed)
+        {
+            OnCrouchTogglePerformed();
+        }
+
+        if (crouchToggleCanceled)
+        {
+            OnCrouchToggleCanceled();
+        }
+
+        if (dodgePerformed)
+        {
+            OnDodgePerformed();
         }
     }
 
-
-    // Event happens when movement inputs are used
-    public override void OnMovement(InputAction.CallbackContext context)
+    private void OnMovementPerformed()
     {
-        if (isStateActive && hasJumped)
+        if (hasJumped)
         {
             owner.ChangeState(new PlayerMoveState(owner));
         }
     }
 
-    public override void OnSprint(InputAction.CallbackContext context)
+    private void OnJumpPerformed()
     {
-        if (isStateActive)
+        if (!hasPressedJump)
         {
-            sprinting = true;
+            hasPressedJump = true;
+            velocity.y += Mathf.Sqrt(-2f * (Physics.gravity.y * owner.GetGravityMultiplier()) * owner.GetJumpHeight());
         }
     }
 
-    public override void OnSprintCanceled(InputAction.CallbackContext context)
+    private void OnJumpCanceled()
     {
-        if (isStateActive)
-        {
-
-            if (toggleSprint == true)
-            {
-                sprinting = true;
-            }
-            else
-            {
-                sprinting = false;
-            }
-        }
+        hasPressedJump = false;
     }
 
-    public override void OnSprintToggle(InputAction.CallbackContext context)
+    public void OnSprintPerformed()
     {
-        if (isStateActive)
+        sprinting = true;
+    }
+
+    public void OnSprintCanceled()
+    {
+        sprinting = false;
+    }
+
+    public void OnSprintTogglePerformed()
+    {
+        if (!hasPressedSprintToggle)
         {
+            hasPressedSprintToggle = true;
             owner.toggleSprint = !owner.toggleSprint;
-            Debug.Log(owner.toggleSprint);
         }
     }
 
-    public override void OnCrouch(InputAction.CallbackContext context)
+    private void OnSprintToggleCanceled()
     {
-        //throw new System.NotImplementedException();
+        hasPressedSprintToggle = false;
     }
 
-    public override void OnCrouchCanceled(InputAction.CallbackContext context)
+    private void OnCrouchTogglePerformed()
     {
-        //throw new System.NotImplementedException();
+        if (hasPressedCrouchToggle)
+        {
+            hasPressedCrouchToggle = true;
+            owner.toggleCrouch = !owner.toggleCrouch;
+        }
     }
 
-    public override void OnCrouchToggle(InputAction.CallbackContext context)
+    private void OnCrouchToggleCanceled()
     {
-        //throw new System.NotImplementedException();
+        hasPressedCrouchToggle = false;
     }
 
-    public override void OnDodge(InputAction.CallbackContext context)
+    public void OnDodgePerformed()
     {
-        //throw new System.NotImplementedException();
+        if (owner.allowAirDash)
+        {
+            return;
+        }
     }
 }

@@ -4,34 +4,45 @@ using UnityEngine.InputSystem;
 public abstract class MovingState : IState
 {
     // Initiate fields
-    public InputAction movement;
-    public InputAction jump;
-    public InputAction sprint;
-    public InputAction sprintToggle;
-    public InputAction crouch;
-    public InputAction crouchToggle;
-    public InputAction dodge;
+    public bool movementPerformed;
+    public bool movementCanceled;
+    public bool jumpPerformed;
+    public bool jumpCanceled;
+    public bool sprintPerformed;
+    public bool sprintCanceled;
+    public bool sprintTogglePerformed;
+    public bool sprintToggleCanceled;
+    public bool crouchPerformed;
+    public bool crouchCanceled;
+    public bool crouchTogglePerformed;
+    public bool crouchToggleCanceled;
+    public bool dodgePerformed;
+    public bool dodgeCanceled;
 
-    public float gravity;
-    public float gravityMultiplier;
-    public Vector3 velocity;
+    public bool hasPressedMovement = false;
+    public bool hasPressedJump = false;
+    public bool hasPressedSprint = false;
+    public bool hasPressedSprintToggle = false;
+    public bool hasPressedCrouch = false;
+    public bool hasPressedCrouchToggle = false;
+    public bool hasPressedDodge = false;
 
     public bool toggleSprint;
     public bool sprinting;
     public bool toggleCrouch;
     public bool crouching;
 
-    protected bool isStateActive;
+    public float gravity;
+    public float gravityMultiplier;
+
+    public Vector3 velocity;
 
     protected PlayerController owner;
-
-    private PlayerInputActions playerInputActions;
-    private InputActionMap playerActionMap;
 
     public MovingState(PlayerController player)
     {
         owner = player;
-        InitiateInputSystem();
+        CheckInput();
         gravity = owner.GetGravity();
         gravityMultiplier = owner.GetGravityMultiplier();
         gravity *= gravityMultiplier;
@@ -43,60 +54,24 @@ public abstract class MovingState : IState
 
     public abstract void Exit();
 
-    // Event happens when jump input is used
-    public abstract void OnJump(InputAction.CallbackContext context);
+    public abstract void CheckStateChange();
 
-    // Event happens when movement input are used
-    public abstract void OnMovement(InputAction.CallbackContext context);
-
-    public abstract void OnSprint(InputAction.CallbackContext context);
-
-    public abstract void OnSprintCanceled(InputAction.CallbackContext context);
-
-    public abstract void OnSprintToggle(InputAction.CallbackContext context);
-
-    public abstract void OnDodge(InputAction.CallbackContext context);
-
-    public abstract void OnCrouch(InputAction.CallbackContext context);
-
-    public abstract void OnCrouchCanceled(InputAction.CallbackContext context);
-
-    public abstract void OnCrouchToggle(InputAction.CallbackContext context);
-
-    public void InitiateInputSystem()
+    public void CheckInput()
     {
-        // Instantiate input system components
-        playerInputActions = new PlayerInputActions();
-        playerActionMap = playerInputActions.Player.Get();
-
-        // Find actions and assign them to input actions
-        movement = playerActionMap.FindAction("Movement");
-        sprint = playerActionMap.FindAction("Sprint");
-        sprintToggle = playerActionMap.FindAction("SprintToggle");
-        jump = playerActionMap.FindAction("Jump");
-        crouch = playerActionMap.FindAction("Crouch");
-        crouchToggle = playerActionMap.FindAction("CrouchToggle");
-        dodge = playerActionMap.FindAction("Dodge");
-
-        // Create events
-        movement.performed += OnMovement;
-        jump.performed += OnJump;
-        sprint.performed += OnSprint;
-        sprint.canceled += OnSprintCanceled;
-        sprintToggle.performed += OnSprintToggle;
-        crouch.performed += OnCrouch;
-        crouch.canceled += OnCrouchCanceled;
-        crouchToggle.performed += OnCrouchToggle;
-        dodge.performed += OnDodge;
-
-        // Enable input actions
-        movement.Enable();
-        jump.Enable();
-        sprint.Enable();
-        sprintToggle.Enable();
-        crouch.Enable();
-        crouchToggle.Enable();
-        dodge.Enable();
+        movementPerformed = InputHandler.movementPerformed;
+        movementCanceled = InputHandler.movementCanceled;
+        jumpPerformed = InputHandler.jumpPerformed;
+        jumpCanceled = InputHandler.jumpCanceled;
+        sprintPerformed = InputHandler.sprintPerformed;
+        sprintCanceled = InputHandler.sprintCanceled;
+        sprintTogglePerformed = InputHandler.sprintTogglePerformed;
+        sprintToggleCanceled = InputHandler.sprintToggleCanceled;
+        crouchPerformed = InputHandler.crouchPerformed;
+        crouchCanceled = InputHandler.crouchCanceled;
+        crouchTogglePerformed = InputHandler.crouchTogglePerformed;
+        crouchToggleCanceled = InputHandler.crouchToggleCanceled;
+        dodgePerformed = InputHandler.dodgePerformed;
+        dodgeCanceled = InputHandler.dodgeCanceled;
     }
 
     public IState GetPreviousState()

@@ -36,7 +36,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": ""Sprint"",
-                    ""type"": ""Value"",
+                    ""type"": ""Button"",
                     ""id"": ""916e4607-bd76-4771-91c2-c01e8acf5ff0"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -52,7 +52,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": ""Crouch"",
-                    ""type"": ""Value"",
+                    ""type"": ""Button"",
                     ""id"": ""fb2f557d-2745-47d3-a4cd-821b65f3896f"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",

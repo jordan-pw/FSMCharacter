@@ -45,6 +45,10 @@ public class StateMachine
 
     public IState GetPreviousState()
     {
-        return previousState;
+        if (previousState == null)
+        {
+            return null;
+        }
+        else return previousState;
     }
 }

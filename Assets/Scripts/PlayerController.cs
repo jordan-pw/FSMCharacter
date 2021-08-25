@@ -40,8 +40,7 @@ public class PlayerController : MonoBehaviour
     private float gravityMultiplier = 2f;
 
     [SerializeField, Range(0, 5)]
-    int maxAirJumps = 0;
-
+    private int maxAirJumps = 0, jumpHeight = 3;
 
     private StateMachine bodyStateMachine;
     private StateMachine headStateMachine;
@@ -72,7 +71,6 @@ public class PlayerController : MonoBehaviour
         return crouchSpeed;
     }
 
-
     public float GetMaxAcceleration()
     {
         return maxAcceleration ;
@@ -93,6 +91,11 @@ public class PlayerController : MonoBehaviour
         return gravityMultiplier;
     }
 
+    public int GetJumpHeight()
+    {
+        return jumpHeight;
+    }
+
     public StateMachine GetBodyStateMachine()
     {
         return bodyStateMachine;
@@ -105,6 +108,16 @@ public class PlayerController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
 
         toggleSprint = false;
+    }
+
+    private void OnEnable()
+    {
+        InputHandler.OnEnable();
+    }
+
+    private void OnDisable()
+    {
+        InputHandler.OnDisable();
     }
 
     private void FixedUpdate()
