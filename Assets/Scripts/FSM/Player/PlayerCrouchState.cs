@@ -12,7 +12,7 @@ public class PlayerCrouchState : MovingState
     {
         Debug.Log("Entering Crouch State");
         toggleCrouch = owner.toggleCrouch;
-        crouching = GetPreviousMovingState().crouching;
+        crouchCheck = GetPreviousMovingState().crouchCheck;
 
         // Set velocity
         velocity = GetPreviousMovingState().velocity;
@@ -28,35 +28,11 @@ public class PlayerCrouchState : MovingState
         CheckInput();
         CheckStateChange();
 
-        // Variables for movement
-        float speed = owner.GetCrouchSpeed();
+        Move();
 
-        float maxAcceleration = owner.GetMaxAcceleration();
-
-        // Desired velocity is the direction*speed
-        Vector3 desiredVelocity =
-            new Vector3(movementVector.x * speed, -1f, movementVector.z * speed);
-
-        maxSpeedChange = maxAcceleration * Time.deltaTime;
-
-        // Move the x and z (horz and vert) velocity towards our desired velocity
-        velocity.x =
-            Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
-        velocity.z =
-            Mathf.MoveTowards(velocity.z, desiredVelocity.z, maxSpeedChange);
-
-        // Apply gravity, when grounded only apply a small amount to enforce groundedness
-        velocity.y = !owner.characterController.isGrounded ?
-            velocity.y += gravity * Time.deltaTime : velocity.y = gravity * Time.deltaTime;
-
-        Vector3 displacement = velocity * Time.deltaTime;
-
-        owner.characterController.Move(displacement);
-
-        if (!owner.characterController.isGrounded)
+        if (!characterController.isGrounded)
         {
-            owner.toggleCrouch = false;
-            owner.ChangeState(new PlayerIdleState(owner));
+            owner.ChangeState(new PlayerMoveState(owner));
         }
     }
 
@@ -70,6 +46,11 @@ public class PlayerCrouchState : MovingState
         if (movementPerformed)
         {
             OnMovementPerformed();
+        }
+
+        if (movementCanceled)
+        {
+            OnMovementCanceled();
         }
 
         if (jumpPerformed)
@@ -118,7 +99,48 @@ public class PlayerCrouchState : MovingState
         }
     }
 
+    private void Move()
+    {
+        // Variables for movement
+        float speed = playerStats.crouchSpeed.BaseValue;
+
+        float maxAcceleration = playerStats.maxAcceleration.BaseValue;
+
+        // Desired velocity is the direction*speed
+        Vector3 desiredVelocity =
+            new Vector3(movementVector.x * speed, -1f, movementVector.z * speed);
+
+        maxSpeedChange = maxAcceleration * Time.deltaTime;
+
+        // Move the x and z (horz and vert) velocity towards our desired velocity
+        velocity.x =
+            Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
+        velocity.z =
+            Mathf.MoveTowards(velocity.z, desiredVelocity.z, maxSpeedChange);
+
+        SetGravity();
+
+        Vector3 displacement = velocity * Time.deltaTime;
+
+        characterController.Move(displacement);
+    }
+
+    private void SetGravity()
+    {
+        groundedGravity = OnSlope() ? -characterController.stepOffset / Time.deltaTime : -1f;
+
+        // Apply gravity, when grounded only apply a small amount to enforce groundedness
+        velocity.y = !characterController.isGrounded ?
+            velocity.y += gravity * Time.deltaTime : velocity.y = groundedGravity;
+    }
+
+
     private void OnMovementPerformed()
+    {
+        movementVector = InputHandler.movementVector;
+    }
+
+    private void OnMovementCanceled()
     {
         movementVector = InputHandler.movementVector;
     }
@@ -132,7 +154,7 @@ public class PlayerCrouchState : MovingState
     private void OnSprintPerformed()
     {
         sprinting = true;
-        owner.toggleCrouch = false;
+        //owner.toggleCrouch = false;
         owner.ChangeState(new PlayerMoveState(owner));
     }
 
@@ -166,7 +188,7 @@ public class PlayerCrouchState : MovingState
 
     private  void OnCrouchTogglePerformed()
     {
-        if (!hasPressedCrouchToggle && !crouching)
+        if (!hasPressedCrouchToggle && !crouchCheck)
         {
             hasPressedCrouchToggle = true;
             toggleCrouch = !toggleCrouch;
@@ -174,7 +196,7 @@ public class PlayerCrouchState : MovingState
 
             if (!toggleCrouch)
             {
-                crouching = true;
+                crouchCheck = true;
                 owner.ChangeState(new PlayerMoveState(owner));
             }
         }
@@ -183,7 +205,7 @@ public class PlayerCrouchState : MovingState
     private void OnCrouchToggleCanceled()
     {
         hasPressedCrouchToggle = false;
-        crouching = false;
+        crouchCheck = false;
     }
 
     private  void OnDodgePerformed()

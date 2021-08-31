@@ -23,8 +23,7 @@ public static class InputHandler
     public static bool sprintPerformed = false;
     public static bool sprintCanceled = false;
     public static bool sprintTogglePerformed = false;
-    public static bool sprintToggleCanceled = false;
-    public static bool crouchPerformed = false;
+    public static bool sprintToggleCanceled = false;    public static bool crouchPerformed = false;
     public static bool crouchCanceled = false;
     public static bool crouchTogglePerformed = false;
     public static bool crouchToggleCanceled = false;
@@ -89,7 +88,7 @@ public static class InputHandler
     {
         movementCanceled = false;
         movementPerformed = true;
-        movementVector =  new Vector3(
+        movementVector = new Vector3(
             obj.ReadValue<Vector2>().x,
             0f,
             obj.ReadValue<Vector2>().y
@@ -102,8 +101,8 @@ public static class InputHandler
         movementCanceled = true;
 
         movementVector = new Vector3(
-            obj.ReadValue<Vector2>().x, 
-            0f, 
+            obj.ReadValue<Vector2>().x,
+            0f,
             obj.ReadValue<Vector2>().y
             );
 

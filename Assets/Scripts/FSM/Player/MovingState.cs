@@ -4,20 +4,25 @@ using UnityEngine.InputSystem;
 public abstract class MovingState : IState
 {
     // Initiate fields
-    public bool movementPerformed;
-    public bool movementCanceled;
-    public bool jumpPerformed;
-    public bool jumpCanceled;
-    public bool sprintPerformed;
-    public bool sprintCanceled;
-    public bool sprintTogglePerformed;
-    public bool sprintToggleCanceled;
-    public bool crouchPerformed;
-    public bool crouchCanceled;
-    public bool crouchTogglePerformed;
-    public bool crouchToggleCanceled;
-    public bool dodgePerformed;
-    public bool dodgeCanceled;
+    public bool sprinting;
+    public bool crouchCheck;
+    public Vector3 velocity;
+    public Vector3 savedVelocity;
+
+    protected bool movementPerformed;
+    protected bool movementCanceled;
+    protected bool jumpPerformed;
+    protected bool jumpCanceled;
+    protected bool sprintPerformed;
+    protected bool sprintCanceled;
+    protected bool sprintTogglePerformed;
+    protected bool sprintToggleCanceled;
+    protected bool crouchPerformed;
+    protected bool crouchCanceled;
+    protected bool crouchTogglePerformed;
+    protected bool crouchToggleCanceled;
+    protected bool dodgePerformed;
+    protected bool dodgeCanceled;
 
     public bool hasPressedMovement = false;
     public bool hasPressedJump = false;
@@ -27,25 +32,28 @@ public abstract class MovingState : IState
     public bool hasPressedCrouchToggle = false;
     public bool hasPressedDodge = false;
 
-    public bool toggleSprint;
-    public bool sprinting;
-    public bool toggleCrouch;
-    public bool crouching;
+    protected bool toggleSprint;
+    protected bool toggleCrouch;
 
-    public float gravity;
-    public float gravityMultiplier;
-
-    public Vector3 velocity;
+    protected float gravity;
+    protected float groundedGravity = -1f;
+    protected float gravityMultiplier;
 
     protected PlayerController owner;
+    protected CharacterController characterController;
+    protected PlayerStats playerStats;
+    protected PlayerStamina playerStamina;
 
     public MovingState(PlayerController player)
     {
         owner = player;
         CheckInput();
-        gravity = owner.GetGravity();
-        gravityMultiplier = owner.GetGravityMultiplier();
+        gravity = PlayerController.gravity;
+        gravityMultiplier = owner.GravityMultiplier;
         gravity *= gravityMultiplier;
+        characterController = player.characterController;
+        playerStats = player.PlayerStats;
+        playerStamina = player.PlayerStamina;
     }
 
     public abstract void Enter();
@@ -54,9 +62,9 @@ public abstract class MovingState : IState
 
     public abstract void Exit();
 
-    public abstract void CheckStateChange();
+    public virtual void CheckStateChange() { }
 
-    public void CheckInput()
+    protected void CheckInput()
     {
         movementPerformed = InputHandler.movementPerformed;
         movementCanceled = InputHandler.movementCanceled;
@@ -74,15 +82,20 @@ public abstract class MovingState : IState
         dodgeCanceled = InputHandler.dodgeCanceled;
     }
 
-    public IState GetPreviousState()
+    protected bool OnSlope()
+    { 
+        return owner.OnSlope(); 
+    }
+
+    protected IState GetPreviousState()
     {
-        IState previousState = owner.GetBodyStateMachine().GetPreviousState();
+        IState previousState = owner.BodyStateMachine.GetPreviousState();
         return previousState;
     }
 
-    public MovingState GetPreviousMovingState()
+    protected MovingState GetPreviousMovingState()
     {
-        IState previousState = owner.GetBodyStateMachine().GetPreviousState();
+        IState previousState = owner.BodyStateMachine.GetPreviousState();
         MovingState adjustedState = (MovingState)previousState;
         return adjustedState;
     }

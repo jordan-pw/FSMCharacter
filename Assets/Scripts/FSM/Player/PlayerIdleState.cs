@@ -8,11 +8,11 @@ public class PlayerIdleState : MovingState
     {
         Debug.Log("Entering Idle State");
 
-        if (crouching = GetPreviousMovingState() != null)
+        if (crouchCheck = (GetPreviousMovingState() != null))
         {
-            crouching = GetPreviousMovingState().crouching;
+            crouchCheck = GetPreviousMovingState().crouchCheck;
         }
-        else crouching = false;
+        else crouchCheck = false;
 
         // Change material
         owner.SetMaterial(owner.idleMaterial);
@@ -27,8 +27,10 @@ public class PlayerIdleState : MovingState
         //Check for input
         CheckInput();
         CheckStateChange();
+
+        if (owner.toggleCrouch) owner.ChangeState(new PlayerCrouchState(owner));
         // Even in idle, gravity must apply.
-        owner.characterController.Move(new Vector3(0, gravity, 0) * Time.deltaTime);
+        characterController.Move(new Vector3(0, gravity, 0) * Time.deltaTime);
     }
 
     public override void Exit()
@@ -88,6 +90,7 @@ public class PlayerIdleState : MovingState
             OnDodgePerformed();
         }
     }
+
     private void OnMovementPerformed()
     {
         owner.ChangeState(new PlayerMoveState(owner));
@@ -129,10 +132,10 @@ public class PlayerIdleState : MovingState
 
     private void OnCrouchTogglePerformed()
     {
-        if (!hasPressedCrouchToggle && !crouching)
+        if (!hasPressedCrouchToggle && !crouchCheck)
         {
             owner.toggleCrouch = true;
-            crouching = true;
+            crouchCheck = true;
             owner.ChangeState(new PlayerCrouchState(owner));
         }
     }
@@ -140,11 +143,14 @@ public class PlayerIdleState : MovingState
     private void OnCrouchToggleCanceled()
     {
         hasPressedCrouchToggle = false;
-        crouching = false;
+        crouchCheck = false;
     }
 
     private void OnDodgePerformed()
     {
-        throw new System.NotImplementedException();
+        // Set velocity to how we moved last, so that the dash has a direction
+        velocity = GetPreviousMovingState().savedVelocity;
+        Debug.Log(velocity);
+        owner.ChangeState(new PlayerDashState(owner));
     }
 }

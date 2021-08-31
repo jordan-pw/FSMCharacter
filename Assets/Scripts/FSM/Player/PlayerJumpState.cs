@@ -30,22 +30,17 @@ public class PlayerJumpState : MovingState
         CheckInput();
         CheckStateChange();
 
-        if (!owner.characterController.isGrounded)
+        if (!characterController.isGrounded)
         {
             hasJumped = true;
         }
 
-        // Apply gravity
-        velocity.y += gravity * Time.deltaTime;
-        velocity.y = Mathf.Max(velocity.y, gravity);
+        Move();
 
-        Vector3 displacement = velocity * Time.deltaTime;
-        // Move the character controller (note that Move does not include gravity)
-        owner.characterController.Move(displacement);
-
-        if (owner.characterController.isGrounded)
+        if (characterController.isGrounded)
         {
             hasJumped = false;
+            owner.JumpsLeft = playerStats.maxJumps.BaseValue;
             owner.ChangeState(new PlayerMoveState(owner));
         }
     }
@@ -62,14 +57,14 @@ public class PlayerJumpState : MovingState
             OnMovementPerformed();
         }
 
-        if (jumpPerformed)
-        {
-            OnJumpPerformed();
-        }
-
         if (jumpCanceled)
         {
             OnJumpCanceled();
+        }
+
+        if (jumpPerformed)
+        {
+            OnJumpPerformed();
         }
 
         if (sprintPerformed)
@@ -108,6 +103,17 @@ public class PlayerJumpState : MovingState
         }
     }
 
+    private void Move()
+    {
+        // Apply gravity
+        velocity.y += gravity * Time.deltaTime;
+        velocity.y = Mathf.Max(velocity.y, gravity);
+
+        Vector3 displacement = velocity * Time.deltaTime;
+        // Move the character controller (note that Move does not include gravity)
+        characterController.Move(displacement);
+    }
+
     private void OnMovementPerformed()
     {
         if (hasJumped)
@@ -116,12 +122,20 @@ public class PlayerJumpState : MovingState
         }
     }
 
+
     private void OnJumpPerformed()
     {
         if (!hasPressedJump)
         {
             hasPressedJump = true;
-            velocity.y += Mathf.Sqrt(-2f * (Physics.gravity.y * owner.GetGravityMultiplier()) * owner.GetJumpHeight());
+            owner.JumpsLeft--;
+            if (owner.JumpsLeft >= 1)
+            {
+                velocity.y = 0;
+                // This formular determines the y velocity to impulse to reach the set jump height
+                velocity.y += (Mathf.Sqrt(-2f * (Physics.gravity.y * owner.GravityMultiplier) * playerStats.jumpHeight.BaseValue)) * 
+                    (owner.JumpsLeft + 1) / playerStats.maxJumps.BaseValue;
+            }
         }
     }
 
@@ -170,7 +184,7 @@ public class PlayerJumpState : MovingState
 
     public void OnDodgePerformed()
     {
-        if (owner.allowAirDash)
+        if (owner.allowAirDash &&  (playerStamina.stamina - playerStats.dashStaminaCost.BaseValue) >= 0)
         {
             return;
         }
