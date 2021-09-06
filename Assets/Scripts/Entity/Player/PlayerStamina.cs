@@ -20,7 +20,6 @@ public class PlayerStamina : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(stamina);
         if (stamina <= 0 && canRecharge)
         {
             canRecharge = false;

@@ -43,6 +43,7 @@ public abstract class MovingState : IState
     protected CharacterController characterController;
     protected PlayerStats playerStats;
     protected PlayerStamina playerStamina;
+    protected Transform inputSpace;
 
     public MovingState(PlayerController player)
     {
@@ -54,6 +55,7 @@ public abstract class MovingState : IState
         characterController = player.characterController;
         playerStats = player.PlayerStats;
         playerStamina = player.PlayerStamina;
+        inputSpace = player.playerInputSpace;
     }
 
     public abstract void Enter();

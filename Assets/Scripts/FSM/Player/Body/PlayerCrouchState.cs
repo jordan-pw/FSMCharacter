@@ -107,8 +107,20 @@ public class PlayerCrouchState : MovingState
         float maxAcceleration = playerStats.maxAcceleration.BaseValue;
 
         // Desired velocity is the direction*speed
-        Vector3 desiredVelocity =
-            new Vector3(movementVector.x * speed, -1f, movementVector.z * speed);
+        Vector3 desiredVelocity;
+
+        // If player has an input space, move in that direction
+        if (inputSpace)
+        {
+            desiredVelocity =
+                inputSpace.TransformDirection(movementVector.x * speed, 0f, movementVector.z * speed);
+        }
+        // Otherwise, move normally
+        else
+        {
+            desiredVelocity =
+                new Vector3(movementVector.x * speed, 0f, movementVector.z * speed);
+        }
 
         maxSpeedChange = maxAcceleration * Time.deltaTime;
 

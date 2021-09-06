@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,7 +6,9 @@ public static class InputHandler
 {
     private static PlayerInputActions playerInputActions = new PlayerInputActions();
     private static InputActionMap playerActionMap = playerInputActions.Player.Get();
+    private static InputActionMap cameraActionMap = playerInputActions.Camera.Get();
 
+    // Player Movement
     public static InputAction movement = playerActionMap.FindAction("Movement");
     public static InputAction jump = playerActionMap.FindAction("Jump");
     public static InputAction sprint = playerActionMap.FindAction("Sprint");
@@ -13,9 +16,16 @@ public static class InputHandler
     public static InputAction crouch = playerActionMap.FindAction("Crouch");
     public static InputAction crouchToggle = playerActionMap.FindAction("CrouchToggle");
     public static InputAction dodge = playerActionMap.FindAction("Dodge");
+    public static InputAction mousePosition = playerActionMap.FindAction("MousePosition");
+
+    // Camera controls
+    public static InputAction rotate = cameraActionMap.FindAction("Rotate");
 
     public static Vector3 movementVector;
+    public static Vector2 mouseVector;
+    public static float rotateAxis;
 
+    // Movement values
     public static bool movementPerformed = false;
     public static bool movementCanceled = false;
     public static bool jumpPerformed = false;
@@ -23,12 +33,17 @@ public static class InputHandler
     public static bool sprintPerformed = false;
     public static bool sprintCanceled = false;
     public static bool sprintTogglePerformed = false;
-    public static bool sprintToggleCanceled = false;    public static bool crouchPerformed = false;
+    public static bool sprintToggleCanceled = false;    
+    public static bool crouchPerformed = false;
     public static bool crouchCanceled = false;
     public static bool crouchTogglePerformed = false;
     public static bool crouchToggleCanceled = false;
     public static bool dodgePerformed = false;
     public static bool dodgeCanceled = false;
+
+    // Camera values
+    public static bool rotatePerformed = false;
+    public static bool rotateCanceled = false;
 
 
     public static void OnEnable()
@@ -41,7 +56,12 @@ public static class InputHandler
         crouch.Enable();
         crouchToggle.Enable();
         dodge.Enable();
+        mousePosition.Enable();
 
+        // Enable camera rotation
+        rotate.Enable();
+
+        // Subscribe
         movement.performed += OnMovement;
         movement.canceled += OnMovementCanceled;
         jump.performed += OnJump;
@@ -56,6 +76,10 @@ public static class InputHandler
         crouchToggle.canceled += OnCrouchToggleCanceled;
         dodge.performed += OnDodge;
         dodge.canceled += OnDodgeCanceled;
+        mousePosition.performed += mousePositionPerformed;
+
+        rotate.performed += OnRotate;
+        rotate.canceled += OnRotateCanceled;
     }
 
     public static void OnDisable()
@@ -68,6 +92,10 @@ public static class InputHandler
         crouch.Disable();
         crouchToggle.Disable();
         dodge.Disable();
+        mousePosition.Disable();
+
+        // Disable camera rotation
+        rotate.Disable();
 
         movement.performed -= OnMovement;
         movement.canceled -= OnMovementCanceled;
@@ -83,6 +111,10 @@ public static class InputHandler
         crouchToggle.canceled -= OnCrouchToggleCanceled;
         dodge.performed -= OnDodge;
         dodge.canceled -= OnDodgeCanceled;
+        mousePosition.performed -= mousePositionPerformed;
+
+        rotate.performed -= OnRotate;
+        rotate.canceled -= OnRotateCanceled;
     }
     private static void OnMovement(InputAction.CallbackContext obj)
     {
@@ -158,7 +190,6 @@ public static class InputHandler
 
     private static void OnCrouchToggle(InputAction.CallbackContext obj)
     {
-        Debug.Log("Blaaa");
         crouchToggleCanceled = false;
         crouchTogglePerformed = true;
     }
@@ -179,5 +210,28 @@ public static class InputHandler
     {
         dodgePerformed = false;
         dodgeCanceled = true;
+    }
+
+
+    private static void mousePositionPerformed(InputAction.CallbackContext obj)
+    {
+        mouseVector = obj.ReadValue<Vector2>();
+    }
+
+    private static void OnRotate(InputAction.CallbackContext obj)
+    {
+        rotateCanceled = false;
+        rotatePerformed = true;
+
+        rotateAxis = obj.ReadValue<float>();
+    }
+
+    private static void OnRotateCanceled(InputAction.CallbackContext obj)
+    {
+        rotatePerformed = false;
+        rotateCanceled = true;
+
+        rotateAxis = 0f;
+
     }
 }

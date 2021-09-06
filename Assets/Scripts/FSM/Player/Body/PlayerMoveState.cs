@@ -9,6 +9,8 @@ public class PlayerMoveState : MovingState
     private float maxSpeedChange;
     private float sprintSpeed;
 
+    private bool pressingSprint;
+
     public PlayerMoveState(PlayerController player) : base(player) { }
 
     public override void Enter()
@@ -17,6 +19,8 @@ public class PlayerMoveState : MovingState
         // Set crouch
         crouchCheck = GetPreviousMovingState().crouchCheck;
         hasPressedJump = GetPreviousMovingState().hasPressedJump;
+
+        pressingSprint = false;
 
         // Set velocity
         velocity = GetPreviousMovingState().velocity;
@@ -41,7 +45,7 @@ public class PlayerMoveState : MovingState
 
         Move();
 
-        if (owner.toggleCrouch && !sprinting && characterController.isGrounded)
+        if (owner.toggleCrouch && !pressingSprint && characterController.isGrounded)
         {
             owner.ChangeState(new PlayerCrouchState(owner));
         }
@@ -50,6 +54,11 @@ public class PlayerMoveState : MovingState
         if (velocity.x == 0 && velocity.z == 0 && characterController.isGrounded)
         {
             owner.ChangeState(new PlayerIdleState(owner));
+        }
+
+        if (owner.touchingLadder)
+        {
+            owner.ChangeState(new PlayerClimbState(owner));
         }
     }
 
@@ -135,8 +144,20 @@ public class PlayerMoveState : MovingState
         float maxAirAcceleration = playerStats.maxAirAcceleration.BaseValue;
 
         // Desired velocity is the direction*speed
-        Vector3 desiredVelocity =
-            new Vector3(movementVector.x * speed, -1f, movementVector.z * speed);
+        Vector3 desiredVelocity;
+
+        // If player has an input space, move in that direction
+        if (inputSpace)
+        {
+            desiredVelocity =
+                inputSpace.TransformDirection(movementVector.x * speed, 0f, movementVector.z * speed);
+        }
+        // Otherwise, move normally
+        else
+        {
+            desiredVelocity =
+                new Vector3(movementVector.x * speed, 0f, movementVector.z * speed);
+        }
 
         // Max speed on change on ground is fast and responsive
         // Max speed change in the air is slower and less responsive
@@ -209,13 +230,28 @@ public class PlayerMoveState : MovingState
 
     private void OnSprintPerformed()
     {
-        sprinting = true;
-        owner.SetMaterial(owner.sprintMaterial);
+        pressingSprint = true;
+        if (toggleSprint)
+        {
+            sprinting = false;
+            owner.SetMaterial(owner.moveMaterial);
+        }
+        else
+        {
+            sprinting = true;
+            owner.SetMaterial(owner.sprintMaterial);
+        }
     }
 
     private void OnSprintCanceled()
     {
-        if (!toggleSprint)
+        pressingSprint = false;
+        if (toggleSprint)
+        {
+            sprinting = true;
+            owner.SetMaterial(owner.sprintMaterial);
+        }
+        else
         {
             sprinting = false;
             owner.SetMaterial(owner.moveMaterial);

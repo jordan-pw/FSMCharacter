@@ -9,8 +9,13 @@ public class PlayerController : MonoBehaviour
 
     public bool allowAirDash;
 
+    public bool touchingLadder = false;
+    public bool sideCollision = false;
+
     public Material idleMaterial, jumpMaterial, moveMaterial,
-    sprintMaterial, crouchMaterial, dashMaterial;
+    sprintMaterial, crouchMaterial, dashMaterial, climbMaterial;
+
+    public Transform playerInputSpace = default;
 
     [HideInInspector]
     public bool toggleCrouch;
@@ -94,8 +99,6 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        _bodyStateMachine = new StateMachine();
-        _bodyStateMachine.Configure(new PlayerIdleState(this));
         characterController = GetComponent<CharacterController>();
         playerStats = GetComponent<PlayerStats>();
         playerStamina = GetComponent<PlayerStamina>();
@@ -104,6 +107,14 @@ public class PlayerController : MonoBehaviour
 
         toggleSprint = false;
         _jumpsLeft = PlayerStats.maxJumps.BaseValue;
+    }
+
+    private void Start()
+    {
+        _bodyStateMachine = new StateMachine();
+        _headStateMachine = new StateMachine();
+        _bodyStateMachine.Configure(new PlayerIdleState(this));
+        _headStateMachine.Configure(new PlayerLookState(this));
     }
 
     private void OnEnable()
@@ -120,11 +131,24 @@ public class PlayerController : MonoBehaviour
     {
         // Calls the state machine update method, which calls the current state's execute method
         _bodyStateMachine.Update();
+        _headStateMachine.Update();
+
+
+        if ((characterController.collisionFlags & CollisionFlags.Sides) != 0)
+        {
+            sideCollision = true;
+        }
+        else
+        {
+            sideCollision = false;
+            touchingLadder = false;
+        }
     }
 
     private void Update()
     {
         JumpReset();
+        Debug.Log(characterController.collisionFlags);
     }
 
     private void JumpReset()
@@ -146,6 +170,19 @@ public class PlayerController : MonoBehaviour
             }
             // Set falling to true so you don't keep losing jumps
             _falling = true;
+        }
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.layer == LayerMask.NameToLayer("Ladder") && !sideCollision)
+        {
+            touchingLadder = true;
+            Debug.Log("bla");
+        }
+        else
+        {
+            touchingLadder = false;
         }
     }
 }
